@@ -1,0 +1,55 @@
+{
+  "name": "tf-employee-management-backend",
+  "version": "1.0.0",
+  "description": "Employee management application",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon --exec babel-node ./src/index.js",
+    "drop_tables": "sequelize db:migrate:undo:all",
+    "create_tables": "sequelize db:migrate",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dom58/tf-employee-management-backend.git"
+  },
+  "author": "Ndahimana Dominique Xavier",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-session": "^1.16.2",
+    "@hapi/joi": "^15.1.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^6.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.9.1",
+    "node-cron": "^2.0.3",
+    "nyc": "^14.1.1",
+    "pg": "^7.11.0",
+    "pg-hstore": "^2.3.3",
+    "regenerator-runtime": "^0.13.2",
+    "sequelize": "^5.8.12",
+    "sequelize-cli": "^5.5.0",
+    "swagger-jsdoc": "^1.3.0",
+    "swagger-ui-express": "^4.0.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "coveralls": "^3.0.4",
+    "mocha": "^6.1.4",
+    "mocha-lcov-reporter": "^1.3.0",
+    "node-mocks-http": "^1.7.6",
+    "nodemon": "^1.19.1"
+  },
+  "bugs": {
+    "url": "https://github.com/Dom58/tf-employee-management-backend/issues"
+  },
+  "homepage": "https://github.com/Dom58/tf-employee-management-backend#readme"
+}
