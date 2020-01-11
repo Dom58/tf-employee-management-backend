@@ -13,7 +13,7 @@ module.exports = {
     "url": process.env.DATABASE_TEST_URL,
     "database": "employee_management_test",
     "username": "postgres",
-    "password": process.env.DATABASE_PASSWORD_DEV,
+    "password": "domdom",
     "dialect": "postgres",
     "operatorsAliases": false
   },
