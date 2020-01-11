@@ -8,7 +8,8 @@ import session from 'express-session';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import users from '../src/routes/userRoute'
-// import swaggerJSDoc from '../swagger.json';
+import employees from '../src/routes/EmployeesRoute'
+import swaggerJSDoc from '../swagger.json';
 
 dotenv.config();
 
@@ -23,13 +24,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(users);
-
-// Access swagger ui documentation on this route
-// app.use('/', swaggerUI.serve, swaggerUI.setup(swaggerJSDoc));
+app.use(employees);
 
 app.get('/', (req, res) => res.status(200).send({
   message: 'Welcome to Employee management system APIs',
 }));
+
+// Access swagger ui documentation on this route
+app.use('/documentation', swaggerUI.serve, swaggerUI.setup(swaggerJSDoc));
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running at http://127.0.0.1:${process.env.PORT}`);

@@ -7,10 +7,16 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING , 
     date_birth: DataTypes.DATE,
     status: DataTypes.STRING,
-    position: DataTypes.STRING
+    position: DataTypes.STRING,
+    userId: DataTypes.INTEGER,
   }, {});
   Employee.associate = function(models) {
     // associations can be defined here
+    Employee.belongsTo(models.User, {
+      as: 'user',
+      foreignKey: 'userId',
+      onDelete: 'CASCADE'
+    });
   };
   return Employee;
 };
