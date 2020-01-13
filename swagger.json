@@ -1,0 +1,724 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Employees Management Documentation API",
+        "version": "1.0.0",
+        "description": "Employees Management system"
+    },
+    "host": "127.0.0.1:7000",
+    "basePath": "/",
+
+    "tags": [
+        {
+            "name": "users",
+            "description": "Manage Managers"
+        },
+        {
+            "name": "employees",
+            "description": "Manage Employee"
+        }
+
+    ],
+
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "consumes": [
+        "application/json",
+        "application/xml"
+    ],
+    "produces": [
+        "application/json",
+        "application/xml"
+    ],
+    "definitions": {
+        "manager_signup": {
+            "required": [
+                "name",
+                "national_id",
+                "phone_number",
+                "email",
+                "date_birth",
+                "password"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "national_id": {
+                    "type": "integer"
+                },
+                "phone_number": {
+                    "type": "integer"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "date_birth": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "login": {
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "all_managers": {
+            "required": [
+                "authorization"
+            ],
+            "properties": {
+                "authorization": {
+                    "type": "string"
+                }
+            }
+        },
+        "update_manager_profile": {
+            "required": [
+                "manager_id",
+                "authorization"
+            ],
+            "properties": {
+                "manager_id": {
+                    "type": "integer"
+                },
+                "authorization": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "national_id": {
+                    "type": "integer"
+                },
+                "phone_number": {
+                    "type": "integer"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "date_birth": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+
+        "create_employee": {
+            "required": [
+                "name",
+                "national_id",
+                "phone_number",
+                "email",
+                "date_birth",
+                "status",
+                "position"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "national_id": {
+                    "type": "integer"
+                },
+                "phone_number": {
+                    "type": "integer"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "date_birth": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "string"
+                }
+            }
+        },
+        "update_employee": {
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "national_id": {
+                    "type": "integer"
+                },
+                "phone_number": {
+                    "type": "integer"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "date_birth": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "string"
+                }
+            }
+        }, 
+        "activate_employee": {
+            "properties": {
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "forgot_password": {
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "reset_password": {
+            "required": [
+                "password",
+                "confirm_password"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "confirm_password": {
+                    "type": "string"
+                }
+            }
+        }
+        
+    },
+    
+
+
+    "paths": {
+        "/manager/signup": {
+            "post": {
+                "tags": [
+                    "users"
+                ],
+                "description": "Create new Manager",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Manager create a new account",
+                        "require": true,
+                        "schema": {
+                            "$ref": "#/definitions/manager_signup"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Manager created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/manager_signup"
+                        }
+                    },
+                    "500": {
+                        "description": "Manager Account was not created"
+                    }
+                }
+            }
+        },
+        "/manager/login": {
+            "post": {
+                "tags": [
+                    "users"
+                ],
+                "description": "Login as a Manager",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Manager login",
+                        "require": true,
+                        "schema": {
+                            "$ref": "#/definitions/login"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "login response",
+                        "schema": {
+                            "$ref": "#/definitions/login"
+                        }
+                    },
+                    "500": {
+                        "description": "Error in Login"
+                    }
+                }
+            }
+        },
+        "/all/users": {
+            "get": {
+                "tags": [
+                    "users"
+                ],
+                "description": "Get all managers",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "description": "Token to authorized manager",
+                        "require": true
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fetch all Managers",
+                        "schema": {
+                            "$ref": "#/definitions/all_managers"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/profile/{manager_id}": {
+            "put": {
+                "tags": [
+                    "users"
+                ],
+                "description": "Update Manager Profile",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "description": "Token to authorized manager",
+                        "require": true
+                    },
+                    {
+                        "name": "manager_id",
+                        "in": "path",
+                        "description": "Manager Id",
+                        "require": true
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Manager update his/her account",
+                        "require": true,
+                        "schema": {
+                            "$ref": "#/definitions/update_manager_profile"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Manager profile updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/update_manager_profile"
+                        }
+                    }
+                }
+            }
+        },
+        
+        "/employees": {
+            "post": {
+                "tags": [
+                    "employees"
+                ],
+                "description": "Create new Employee",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "description": "Token to authorized manager",
+                        "require": true
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Employee created a new account",
+                        "require": true,
+                        "schema": {
+                            "$ref": "#/definitions/create_employee"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Employee created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/create_employee"
+                        }
+                    },
+                    "500": {
+                        "description": "Employee Account was not created"
+                    }
+                }
+            }
+        },
+       
+        "/employees/{id}": {
+            "delete": {
+                "tags": [
+                    "employees"
+                ],
+                "description": "Delete an  Employee account",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "description": "Token to authorized manager",
+                        "require": true
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Delete Employee account",
+                        "require": true
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Employee Deleted successfully"
+                        
+                    },
+                    "500": {
+                        "description": "Error to delete Employee Account "
+                    }
+                }
+            }
+        },
+
+        "/employees/{id}/": {
+            "put": {
+                "tags": [
+                    "employees"
+                ],
+                "description": "Delete an  Employee account",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "description": "Token to authorized manager",
+                        "require": true
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Update Employee account",
+                        "require": true
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Update Employee account field",
+                        "require": true,
+                        "schema": {
+                            "$ref": "#/definitions/update_employee"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Employee updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/update_employee"
+                        }
+                    },
+                    "500": {
+                        "description": "Error to update Employee Account "
+                    }
+                }
+            }
+        },
+        
+        "/employees/{id}/activate": {
+            "put": {
+                "tags": [
+                    "employees"
+                ],
+                "description": "Activate an  Employee account",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "description": "Token to authorized manager",
+                        "require": true
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Activate Employee account id",
+                        "require": true
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Activate Employee account field",
+                        "require": true,
+                        "schema": {
+                            "$ref": "#/definitions/activate_employee"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Employee Activated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/update_employee"
+                        }
+                    },
+                    "500": {
+                        "description": "Error to Activate Employee Account "
+                    }
+                }
+            }
+        },
+        
+        "/employees/{id}/suspend": {
+            "put": {
+                "tags": [
+                    "employees"
+                ],
+                "description": "Suspend an  Employee account",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "description": "Token to authorized manager",
+                        "require": true
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Suspend Employee account id",
+                        "require": true
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Suspend Employee account field",
+                        "require": true,
+                        "schema": {
+                            "$ref": "#/definitions/activate_employee"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Employee Activated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/update_employee"
+                        }
+                    },
+                    "500": {
+                        "description": "Error to Suspend Employee Account "
+                    }
+                }
+            }
+        },
+        "/all/employees": {
+            "get": {
+                "tags": [
+                    "employees"
+                ],
+                "description": "Fetch all Employees accounts",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "description": "Token to authorized manager",
+                        "require": true
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "All Employees accounts",
+                        "schema": {
+                            "$ref": "#/definitions/create_employee"
+                        }
+                    },
+                    "500": {
+                        "description": "Employees Accounts was not fetched"
+                    }
+                }
+            }
+        },
+        "/employees/search": {
+            "post": {
+                "tags": [
+                    "employees"
+                ],
+                "description": "Search in  Employees accounts",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "description": "Token to authorized manager",
+                        "require": true
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Name of an Employee",
+                        "require": true
+                    },
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "description": "Email of an employee",
+                        "require": true
+                    },
+                    {
+                        "name": "position",
+                        "in": "query",
+                        "description": "Position of an employee",
+                        "require": true
+                    },
+                    {
+                        "name": "phone_number",
+                        "in": "query",
+                        "description": "Phone number of an employee",
+                        "require": true
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "All Employees accounts retrieved",
+                        "schema": {
+                            "$ref": "#/definitions/create_employee"
+                        }
+                    },
+                    "500": {
+                        "description": "Employees Accounts was not fetched"
+                    }
+                }
+            }
+        },
+        "/manager/forgot-password": {
+            "post": {
+                "tags": [
+                    "users"
+                ],
+                "description": "Forgot manager password",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Search manager email",
+                        "require": true,
+                        "schema": {
+                            "$ref": "#/definitions/forgot_password"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Please check your email address to reset your password!",
+                        "schema": {
+                            "$ref": "#/definitions/forgot_password"
+                        }
+                    },
+                    "500": {
+                        "description": "Error to reset password"
+                    }
+                }
+            }
+        },
+        "/manager/reset-password/{token}": {
+            "post": {
+                "tags": [
+                    "users"
+                ],
+                "description": "Reset a manager password",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "description": "Manager Token",
+                        "require": true
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Password and Confirm password",
+                        "require": true,
+                        "schema": {
+                            "$ref": "#/definitions/reset_password"
+                        }
+                    }
+
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Password changed successfully, Return to Login!",
+                        "schema": {
+                            "$ref": "#/definitions/reset_password"
+                        }
+                    },
+                    "500": {
+                        "description": "Error to reset password"
+                    }
+                }
+            }
+        }
+        
+        
+    }
+}

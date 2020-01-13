@@ -3,7 +3,12 @@ import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import sGmail from '@sendgrid/mail';
 import model from '../db/models/index';
-import {signupValidator, loginValidator} from '../middlewares/userValidation';
+import {
+    signupValidator, 
+    loginValidator, 
+    updateProfileValidator,
+    resetPasswordValidator
+} from '../middlewares/userValidation';
 
 
 
@@ -35,23 +40,6 @@ class UserManager {
             return res.status(400).json({errors});
         } 
         try {
-            
-            // const sendCongrat = async(email, token) =>  {
-            //     const message = {
-            //       to: email,
-            //       from: 'awesomity@gmail.com',
-            //       Subject: `Hello ${email}`,
-            //       text: 'Haapa is pleasure to have a user like you!',
-            //       html: `<p>Hello There, <br />
-            //       Thank you very much for joining our company.
-            //       </p>
-            //       <br />
-            //       <p>Best Regards, <b>Awesomity</b></p>
-            //   ` 
-            //     };
-            //     sGmail.setApiKey(process.env.SENDGRID_API_KEY);
-            //     await sGmail.send(message);
-            // };
 
             const findUser = await User.findOne({where: {email}});
             const findNid = await User.findOne({where: {national_id}});
@@ -84,9 +72,6 @@ class UserManager {
                 email: userData.dataValues.email
             }
             const token = jwt.sign(payload, process.env.SECRET_JWT_KEY);
-
-            //  Send email verification to user email account
-            // await sendCongrat(email, token);
 
             return res.status(201).json(
                 {message: 'Manager crested successfully',
@@ -167,6 +152,154 @@ class UserManager {
             return res.status(500).json({ error: 'Internal Server Error, Please try again' });
         }
 
+    }
+
+    static async all_users(req, res) {
+
+        if (req.user.position !== 'manager') {
+            return res.status(401).json({ error: 'Access Denied. Only manager can access this route' });
+        }
+
+        try {
+            const users=await User.findAll({
+                order: [['updatedAt', 'DESC']],
+            });
+
+            if (!users[0]) {
+                return res.status(404).json({
+                    message: "No manager created yet"
+                })
+            }
+            
+            return res.status(200).json({
+                data: users
+            });
+
+        } catch(error){
+            return res.status(500).json({ error: 'Internal Server Error, Please try again' });
+        }
+    }
+
+    static async update_profile(req, res) { 
+
+        const {name,national_id,phone_number,date_birth,email} = req.body
+        const { id } = req.user;
+        const { manager_id } = req.params;
+        const convertedId = parseInt(manager_id)
+        
+        const errors = updateProfileValidator(req.body);
+        if (errors) {
+            return res.status(400).json({errors});
+        }
+
+        try { 
+
+            const findManager = await User.findOne({where: {id: convertedId}});
+
+            if(!findManager) {
+                return res.status(404).json({ error: `Manager with id #${convertedId}# not found!` });
+            }
+
+            if(convertedId !== id) {
+                return res.status(404).json({ error: `You are not allowed to update others profile` });
+            }
+
+            const updateInfo= {
+                name: name ||findManager.dataValues.name,
+                national_id: national_id||findManager.dataValues.national_id,
+                phone_number: phone_number || findManager.dataValues.phone_number,
+                date_birth: date_birth || findManager.dataValues.date_birth,
+                email: email || findManager.dataValues.email
+            }
+                
+                await User.update(updateInfo,{where:{id: findManager.id}});
+                const updatedUser = await User.findOne({where:{id: findManager.id}});
+
+                return res.status(200).json({ 
+                    message:"User Info Updated Successfully!",
+                    data: updatedUser.dataValues
+                })
+
+        } catch(error){
+            return res.status(500).json({ error: 'Internal Server Error, Please try again' });
+        }
+    }
+
+    static async forgot_password(req, res) {
+        const sendResetPasswordLink = async(name,email, token) =>  {
+            const message = {
+                to: email,
+                from: 'smart.managers@gmail.com',
+                Subject: `Password Reset `,
+                text: 'SmartManagers Ltd is pleasure to have a Manager like you!',
+                html: `<p>Hello ${name}, 
+                <br />
+                Dear ${name.bold()},<br>You have requested to reset your password.
+                </p>
+
+                <br />
+                <a href=http://localhost:7000/manager/reset_password/${token} target='_blank' style='margin-left: 8%; margin-top: 100px;  border: 1px solid white; text-align: center; margin-top: 8px; background-color: #f15921; color: white; border-radius: 5px; cursor: pointer; outline: none; padding: 8px; text-decoration: none;'> Reset your Password </a>
+                <br />
+                <p>Best Regards, <b>SmartManagers</b></p>
+          ` 
+            };
+            sGmail.setApiKey(process.env.SENDGRID_API_KEY);
+            await sGmail.send(message);
+        };
+
+        const {email}= req.body;
+        try {
+
+            const findManager = await User.findOne({where: {email}});
+            if(!findManager) {
+              return res.status(400).json({error: 'Email not exist!'});
+            }
+
+            const payload = {
+                id: findManager.dataValues.id,
+                name: findManager.dataValues.name,
+                email: findManager.dataValues.email
+            }
+
+            const name = findManager.dataValues.name;
+            const token = jwt.sign(payload, process.env.SECRET_JWT_KEY, {expiresIn: '24h'});
+
+            // Send reset password url on user email
+            await sendResetPasswordLink(name, email, token);
+
+            return res.status(200).json({message:'Please check your email address to reset your password!'});
+
+          } catch (error) {
+            //   console.log(error)
+            return res.status(500).json({error:'Internal Server Error! Please try again later'});
+            };
+    }
+
+    static async reset_password (req, res){
+        const {password, confirm_password} = req.body;
+        const {token} = req.params;
+
+        const errors = resetPasswordValidator(req.body);
+        if (errors) {
+            return res.status(400).json({errors});
+        } 
+        try {
+            const decodedToken = jwt.decode(token);
+            const findManager = await User.findOne({where: {email:decodedToken.email}});
+      
+            if(!findManager) {
+              return res.status(400).json({error: 'Email not exist!'});
+            }
+      
+            // change password 
+            const hashPassword = await bcrypt.hash(password, 12);
+            await User.update({ password: hashPassword}, { where: { id: findManager.id } });
+
+            return res.status(200).json({message:'Password changed successfully, Return to Login!'});
+
+        } catch(error){
+            return res.status(500).json({error: 'Internal Server Error'});
+        }
     }
 
 }
